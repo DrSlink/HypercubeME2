@@ -1,0 +1,7 @@
+# Project exclude paths
+/cmake-build-release/
+/cmake-build-debug/
+/.idea/
+/__pycache__/
+/hypercubes/
+/hypercubes_mut/
