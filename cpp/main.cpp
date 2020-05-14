@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <chrono>
+#include <algorithm>
 
 
 int get_last_diag_start(const std::string &key) {
@@ -20,7 +21,7 @@ int get_last_diag_start(const std::string &key) {
 void process_genotype(const std::string &key, const int last_diag_start, const std::string &genotype,
                       std::unordered_set<std::string> &genes, std::unordered_set<std::string> &mutations,
                       std::unordered_map<std::string, std::vector<std::string>> &result) {
-    for (std::string mutation : mutations) {
+    for (const std::string &mutation : mutations) {
         int mut_idx = mutation[0];
         char mutation_name = mutation.back();
         if (genotype[mut_idx] != mutation_name) {
@@ -51,7 +52,7 @@ void process_genotype(const std::string &key, const int last_diag_start, const s
 
 void process_diagonals(const std::unordered_map<std::string, std::vector<std::string>> &dataset,
                        std::unordered_map<std::string, std::vector<std::string>> &result) {
-    for (std::pair<std::string, std::vector<std::string>> diagonal : dataset) {
+    for (const auto &diagonal : dataset) {
         std::unordered_set<std::string> genes;
         std::unordered_set<std::string> mutations;
         int last_diag_start = get_last_diag_start(diagonal.first);
@@ -61,7 +62,8 @@ void process_diagonals(const std::unordered_map<std::string, std::vector<std::st
     }
 }
 
-int main(int argc, char* argv[]) {
+
+int main(int argc, char *argv[]) {
     std::chrono::time_point<std::chrono::system_clock> start, end;
     start = std::chrono::system_clock::now();
     std::string input = argv[1];
@@ -69,6 +71,7 @@ int main(int argc, char* argv[]) {
     std::string line;
     std::vector<std::string> genomes;
     if (my_file.is_open()) {
+        std::getline(my_file, line);
         while (std::getline(my_file, line)) {
             genomes.push_back(line);
         }
@@ -80,9 +83,31 @@ int main(int argc, char* argv[]) {
             std::cout << dataset[(dimension + 1) % 2].size() << std::endl;
             int number_diagonals = dataset[(dimension + 1) % 2].size();
             int number_hypercubes = 0;
-            for (std::pair<std::string, std::vector<std::string>> diagonal : dataset[(dimension + 1) % 2]) {
+
+            std::vector<std::pair<std::string, std::vector<std::string>>> res_data(dataset[(dimension + 1) % 2].begin(),
+                                                                                   dataset[(dimension + 1) % 2].end());
+            std::sort(res_data.begin(), res_data.end());
+
+            std::string buff_string;
+            for (const auto &diagonal : res_data) {
                 number_hypercubes += diagonal.second.size();
+                std::string new_diagonal;
+                for (int i = 4; i <= diagonal.first.size(); i += 4) {
+                    new_diagonal.append({diagonal.first[i - 3]});
+                    new_diagonal.append(std::to_string(diagonal.first[i - 2]));
+                    new_diagonal.append(diagonal.first, i - 1, 2);
+                }
+                new_diagonal.append({'\t'});
+                for (const std::string &offset : diagonal.second) {
+                    buff_string.append(new_diagonal + offset);
+                    buff_string.append({'\n'});
+                }
             }
+            std::ofstream res_file;
+            res_file.open("hypercubes_" + std::to_string(dimension) + ".txt");
+            res_file << buff_string;
+            res_file.close();
+
             std::cout << number_hypercubes << std::endl;
             dataset[dimension % 2].clear();
             dimension += 1;
