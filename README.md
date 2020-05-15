@@ -1,6 +1,6 @@
 # HypercubeME2
 Reimplementation of the algorithm for generating all combinatorially complete datasets of sequences, proposed in the article: ["HypercubeME: two hundred million combinatorially complete datasets from a single experiment"](https://doi.org/10.1093/bioinformatics/btz841)  
-Here proposed a new algorithm based on hash tables, which is asymptotically faster.
+A new algorithm is proposed based on hash tables, which is asymptotically faster.
 
 | Script | Algorithm | S7 time | S5 time |
 | ------------- | :-------------: | :-------------: | :-------------: |
@@ -12,7 +12,7 @@ Here proposed a new algorithm based on hash tables, which is asymptotically fast
 (*) results from paper  
 (**) speed increase, compared to original script
 
-All data was taken from [this](https://github.com/Lcarey/HIS3InterspeciesEpistasis/tree/master/Data) repository and cleared as it proposed in the paper.
+All data was taken from [this](https://github.com/Lcarey/HIS3InterspeciesEpistasis/tree/master/Data) repository and cleared as suggested by the paper.
 
 `HypercubeME_re.py` works on the same input format as the original script.  
 `python3 HypercubeME_re.py -m mutations_file.txt -d destination_folder`
@@ -31,3 +31,9 @@ Where `genotypes_file.txt` should look like:
 aa_seq  
 CHALAKHAGWSLIVECIGDLFVDDHHSSED  
 CHALAKHGGWSLIVECIGDLFIDDHHSLED
+
+
+### Asymptotic
+![orig_re](/plots/orig_re.png)
+![all](/plots/all.png)
+![hash_py_cpp](/plots/hash_py_cpp.png)
