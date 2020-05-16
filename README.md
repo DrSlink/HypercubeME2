@@ -33,7 +33,15 @@ CHALAKHAGWSLIVECIGDLFVDDHHSSED
 CHALAKHGGWSLIVECIGDLFIDDHHSLED
 
 
-### Asymptotic
-![orig_re](/plots/orig_re.png)
-![all](/plots/all.png)
-![hash_py_cpp](/plots/hash_py_cpp.png)
+##### Time to generate all 1-dimentional hypercubes in milliseconds
+
+| Script | S1 | S2 | S3 | S4 | S5 | S6 | S7 | S8 | S9 | S10 | S11 | S12 |
+| ------ | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
+| `HypercubeME.py (orig)`| - | - | - | - | - | - | 1116662 | - | - | - | 5600298 | 17012930 |
+| `HypercubeME_re.py` |935761 | 1606538 | 1153554 | 1012247 | 1121166 | 948298 | 63736 | 803821 | 1359025 | 993878 | 312357 | 812896 |
+| `HypercubeME_hash_table.py` | 11809 | 13447 | 8424 | 9510 | 11920 | 8500 | 1917 | 7189 | 6200 | 8803 | 2515 | 5082 |
+| `HypercubeME_hash_table.cpp` | 2165 | 2677 | 2016 | 1662 | 2425 | 1882 | 376 | 1521 | 1348 | 1370 | 521 | 1040 |
+
+| original vs reimplemented | reimplemented vs python hash table | python hash table vs c++ hash table |
+| :-: | :-: | :-: |
+| ![orig_re](/plots/orig_vs_re.png) | ![all](/plots/re_vs_pyhash.png) | ![hash_py_cpp](/plots/pyhash_vs_cpphash.png) |
