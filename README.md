@@ -22,7 +22,7 @@ mut_list
 0C:7A:20F:21V:26S:27S  
 0C:7G:20F:26S:27L  
 
-The script would create `destination_folder` if it not existed before. You may not specify this parameter, then the script will create the folder with name hypercubes_mut 
+The script creates `destination_folder` if it doesn't exist. You may not specify this parameter, then the script will create the folder with name `hypercubes_mut` 
 
 `HypercubeME_hash_table.py` and `HypercubeME_hash_table.cpp` works on full sequenses but not mutations.  
 `python3 HypercubeME_hash_table.py -g genotypes_file.txt -d destination_folder`
@@ -33,7 +33,7 @@ CHALAKHAGWSLIVECIGDLFVDDHHSSED
 CHALAKHGGWSLIVECIGDLFIDDHHSLED
 
 
-##### Time to generate all 1-dimentional hypercubes in milliseconds
+##### Time for generation of all 1-dimentional hypercubes in milliseconds
 
 | Script | S1 | S2 | S3 | S4 | S5 | S6 | S7 | S8 | S9 | S10 | S11 | S12 |
 | ------ | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
