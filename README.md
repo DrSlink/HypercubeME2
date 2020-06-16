@@ -6,7 +6,7 @@ A new algorithm is proposed based on hash tables, which is asymptotically faster
 | ------------- | :-------------: | :-------------: | :-------------: |
 | [`HypercubeME.py (orig)`](https://github.com/ivankovlab/HypercubeME/blob/master/HypercubeME.py) | proposed in paper |   1h58min54s (≈2h)* | not mesured (≈10d)* |
 | `HypercubeME_re.py` | proposed in paper | 7min01s (17x)** | not mesured | 
-| `HypercubeME_hash_table.py` | hash table | 1min39s (72x)** | 6min49s (2112x)** |
+| `HypercubeME_hash_table.py` | hash table | 0min26s (274x)** | 1min16s (11368x)** |
 | `HypercubeME_hash_table.cpp` |  hash table | 0min19s (375x)** | 1min00s (14400x)** |
 
 (*) results from paper  
@@ -25,7 +25,7 @@ mut_list
 The script creates `destination_folder` if it doesn't exist. You may not specify this parameter, then the script will create the folder with name `hypercubes_mut` 
 
 `HypercubeME_hash_table.py` and `HypercubeME_hash_table.cpp` works on full sequenses but not mutations.  
-`python3 HypercubeME_hash_table.py -g genotypes_file.txt -d destination_folder`
+`python3 HypercubeME_hash_table.py -s sequences_file.txt -d destination_folder`
 
 Where `genotypes_file.txt` should look like:  
 aa_seq  
