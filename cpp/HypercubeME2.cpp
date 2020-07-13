@@ -184,7 +184,6 @@ void process_diagonals_ht(std::unordered_map<std::string, std::vector<std::share
 bool substr_equal(const std::shared_ptr<const std::string> &first, const std::shared_ptr<const std::string> &second,
                   const unsigned long start, const unsigned long len) {
     return (*first).compare(start, len, (*second), start, len) == 0;
-//    return std::string_view((*first).c_str() + start, len) == std::string_view((*second).c_str() + start, len);
 }
 
 std::size_t substr_hash(const std::shared_ptr<const std::string> &first,
@@ -193,51 +192,58 @@ std::size_t substr_hash(const std::shared_ptr<const std::string> &first,
     return hashFn(std::string_view((*first).c_str() + start, len));
 }
 
+void add_combinations(const std::string &diagonal, const std::vector<std::shared_ptr<const std::string>> &group,
+                      std::unordered_map<std::string, std::vector<std::shared_ptr<const std::string>>> &result,
+                      const unsigned long rest_start, const unsigned long group_size) {
+    std::string res_start_str = std::to_string(rest_start);
+    for (int i = 1; i < group_size; i++) {
+        for (int j = 0; j < i; j++) {
+            std::string new_diagonal = diagonal;
+            new_diagonal += ':';
+            new_diagonal += (*group[j])[rest_start];
+            new_diagonal += res_start_str;
+            new_diagonal += (*group[i])[rest_start];
+            result[new_diagonal].push_back(group[i]);
+        }
+    }
+}
+
 void proc_rec(const std::string *diagonal, const std::vector<std::shared_ptr<const std::string>> *group,
               std::unordered_map<std::string, std::vector<std::shared_ptr<const std::string>>> *result,
               const unsigned long start, const unsigned long end, const unsigned long rest_start,
               const unsigned long rest_end) {
-    if (rest_end != rest_start) {
-        if (end == start && rest_end - rest_start == 1) {
-            unsigned long vec_size = (*group).size();
-            std::string res_start_str = std::to_string(rest_start);
-            for (int i = 1; i < vec_size; i++) {
-                for (int j = 0; j < i; j++) {
-                    if ((*(*group)[i])[rest_start] < (*(*group)[j])[rest_start]) {
-                        (*result)[*diagonal + ':' + (*(*group)[i])[rest_start] + res_start_str +
-                                  (*(*group)[j])[start]].push_back((*group)[j]);
-                    } else {
-                        (*result)[*diagonal + ':' + (*(*group)[j])[rest_start] + res_start_str +
-                                  (*(*group)[i])[start]].push_back((*group)[i]);
-                    }
-                }
-            }
-        } else {
-            unsigned long len = end - start;
-            auto hash = [start, len](const std::shared_ptr<const std::string> &n) {
-                return substr_hash(n, start, len);
-            };
-            auto equal = [start, len](const std::shared_ptr<const std::string> &l,
-                                      const std::shared_ptr<const std::string> &r) {
-                return substr_equal(l, r, start, len);
-            };
-            std::unordered_map<std::shared_ptr<const std::string>, std::vector<std::shared_ptr<const std::string>>,
-                    decltype(hash), decltype(equal)> m(8, hash, equal);
-            for (const auto &seq : (*group)) {
-                m[seq].push_back(seq);
-            }
+    unsigned long len = end - start;
+    auto hash = [start, len](const std::shared_ptr<const std::string> &n) {
+        return substr_hash(n, start, len);
+    };
+    auto equal = [start, len](const std::shared_ptr<const std::string> &l,
+                              const std::shared_ptr<const std::string> &r) {
+        return substr_equal(l, r, start, len);
+    };
+    std::unordered_map<std::shared_ptr<const std::string>, std::vector<std::shared_ptr<const std::string>>,
+            decltype(hash), decltype(equal)> subgroups(8, hash, equal);
+    for (const auto &seq : (*group)) {
+        subgroups[seq].push_back(seq);
+    }
 
-            unsigned long half = (rest_start + rest_end) / 2;
+    unsigned long half = (rest_start + rest_end) / 2;
 
-            auto elem_it = m.begin();
-            while (elem_it != m.end()) {
-                if (elem_it->second.size() > 1) {
-                    proc_rec(diagonal, &elem_it->second, result, rest_start, half, half, rest_end); // you know
-                    proc_rec(diagonal, &elem_it->second, result, half, rest_end, rest_start, half);
-                }
-                elem_it = m.erase(elem_it);
+    auto elem_it = subgroups.begin();
+    while (elem_it != subgroups.end()) {
+        unsigned long group_size = elem_it->second.size();
+        if (group_size > 1) {
+            if (rest_start == half && rest_end - half == 1) {
+                add_combinations(*diagonal, elem_it->second, *result, half, group_size);
+            } else if (half != rest_end) {
+                proc_rec(diagonal, &elem_it->second, result, rest_start, half, half, rest_end);
+            }
+            if (rest_end == half && half - rest_start == 1) {
+                add_combinations(*diagonal, elem_it->second, *result, rest_start, group_size);
+            } else if (half != rest_start) {
+                proc_rec(diagonal, &elem_it->second, result, half, rest_end, rest_start, half);
             }
         }
+        elem_it = subgroups.erase(elem_it);
     }
 }
 
@@ -260,7 +266,7 @@ void process_diagonals_rht(std::unordered_map<std::string, std::vector<std::shar
 //=====================================================================================================================
 
 int main(int argc, char *argv[]) {
-    if (argc <= 1 ) {
+    if (argc <= 1) {
         std::cout << "First argument should be algorithm: cmp, k-mer, hash or recursive\n";
         std::cout << "Second argument should be name of existing file with sequences";
         return 0;
@@ -328,13 +334,15 @@ int main(int argc, char *argv[]) {
             res_file.open("hypercubes_" + std::to_string(dimension) + ".txt");
             for (const auto &diagonal : res_data) {
                 number_hypercubes += dataset[(dimension + 1) % 2][*diagonal].size();
+                std::sort(dataset[(dimension + 1) % 2][*diagonal].begin(),
+                          dataset[(dimension + 1) % 2][*diagonal].end(),
+                          comp_str_shared_ptr);
                 std::string new_diagonal = (*diagonal).substr(1) + '\t';
                 for (const auto &offset : dataset[(dimension + 1) % 2][*diagonal]) {
                     res_file << new_diagonal << *offset << '\n';
                 }
             }
             res_file.close();
-            res_file << number_hypercubes;
             std::cout << "Number of " << dimension << " dimensional hypercubes: " << number_hypercubes << std::endl;
             dimension += 1;
             if (number_diagonals == number_hypercubes) {
